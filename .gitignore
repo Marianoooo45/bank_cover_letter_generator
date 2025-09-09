@@ -22,3 +22,5 @@ generated_letters/
 *.db
 *.log
 *.tmp
+
+cv.txt
