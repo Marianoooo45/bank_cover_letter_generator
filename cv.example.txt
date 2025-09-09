@@ -1,0 +1,34 @@
+NOM
+Votre Nom
+
+ADRESSE
+Votre adresse complète
+
+CONTACT
+Téléphone | Email
+
+PROFIL
+Résumé de 3–4 lignes sur votre profil et objectifs.
+
+EXPÉRIENCES
+Entreprise – Poste – Ville (Année–Année)
+• Réalisation 1
+• Réalisation 2
+• Réalisation 3
+
+Entreprise – Poste – Ville (Année–Année)
+• Réalisation 1
+• Réalisation 2
+
+FORMATION
+École – Diplôme (Années)
+
+COMPÉTENCES
+Techniques : …
+Produits : …
+Soft skills : …
+
+LANGUES
+Français : …
+Anglais : …
+Espagnol : …
