@@ -1,95 +1,88 @@
-from typing import List
-import json
-import os
-from pathlib import Path
+import os, re
+from openai import OpenAI
 import config
 
-try:
-    from openai import OpenAI
-except Exception as e:
-    raise RuntimeError("Installe le SDK OpenAI: pip install openai") from e
+_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
+SYS_EN = (
+    "You are a cover-letter assistant. Return 3–4 concise paragraphs ONLY, plain text.\n"
+    "Do NOT include greeting or closing (no 'Dear…', no 'Yours…'). Start directly with content."
+)
+SYS_FR = (
+    "Tu es un assistant de lettre de motivation. Rends UNIQUEMENT 3–4 paragraphes concis, en texte brut.\n"
+    "N’inclus NI salutation NI formule de politesse. Commence directement par le contenu."
+)
 
-def _client() -> "OpenAI":
-    if config.OPENAI_API_BASE:
-        return OpenAI(api_key=config.OPENAI_API_KEY, base_url=config.OPENAI_API_BASE)
-    return OpenAI(api_key=config.OPENAI_API_KEY)
+# ---------- Normalisation / Nettoyage ----------
+NBSP = "\u00A0"
+ZWS  = "\u200B"
 
+# salutations communes (EN/FR)
+GREET_RX = re.compile(
+    r"^\s*(dear(\s+hiring\s+(team|manager))?|bonjour|madame|monsieur|a\s+l'attention|à\s+l'attention)\b[^\n]*?,?\s*",
+    re.IGNORECASE,
+)
+# closings communes
+CLOSE_RX = re.compile(
+    r"\b(yours\s+sincerely|kind\s+regards|best\s+regards|cordialement)\b.*$",
+    re.IGNORECASE,
+)
 
-def _app_dir() -> Path:
-    """Répertoire de l'app (compatible exécutable PyInstaller)."""
-    import sys
-    if getattr(sys, "frozen", False):
-        return Path(sys.executable).parent
-    return Path(__file__).resolve().parent
+def _normalize_ws(s: str) -> str:
+    # remplace NBSP/ZWS, nettoie bullets/ponctuation parasite en tête
+    s = (s or "").replace(NBSP, " ").replace(ZWS, " ")
+    s = s.strip()
+    # retire puces/traits en tout début de ligne
+    s = re.sub(r"^[\u2022>\-\*\•\s]+", "", s)
+    return s
 
+def _strip_greetings_text(text: str) -> str:
+    """Enlève une salutation tout en haut + closing en bas, conserve le reste."""
+    t = _normalize_ws(text)
 
-def _read_cv_text() -> str:
-    """
-    Lit le CV texte brut. Ordre de recherche :
-    1) Variable d'env CV_PATH (si définie)
-    2) ./cv.txt à côté des sources
-    3) ./cv.txt dans le dossier courant
-    Si introuvable, retourne une chaîne vide (le LLM se débrouille avec le reste).
-    """
-    env_path = os.getenv("CV_PATH")
-    if env_path and Path(env_path).is_file():
-        return Path(env_path).read_text(encoding="utf-8", errors="ignore")
+    # 1) si le texte commence par une salut, supprime la ligne de salut
+    t = re.sub(r"^\s*(dear[^\n]{0,120})\n+", "", t, flags=re.IGNORECASE)
 
-    p1 = _app_dir() / "cv.txt"
-    if p1.is_file():
-        return p1.read_text(encoding="utf-8", errors="ignore")
+    # 2) supprime toute salut au tout début même si non suivie d'un saut de ligne
+    t = GREET_RX.sub("", t)
 
-    p2 = Path.cwd() / "cv.txt"
-    if p2.is_file():
-        return p2.read_text(encoding="utf-8", errors="ignore")
+    # 3) supprime les closings à la fin (et lignes qui suivent)
+    lines = t.splitlines()
+    while lines and CLOSE_RX.search(_normalize_ws(lines[-1])):
+        lines.pop()
+    return "\n".join(lines).strip()
 
-    return ""
+def _paragraphize(text: str) -> list[str]:
+    """Nettoie (salut/closing) puis découpe en paragraphes; retire salut résiduels par paragraphe."""
+    t = _strip_greetings_text(text)
+    parts = [p for p in re.split(r"\n\s*\n+", t) if _normalize_ws(p)]
+    cleaned = []
+    for p in parts:
+        p = _normalize_ws(p)
+        # retire une éventuelle salut restante au début du paragraphe mais garde le contenu
+        p = GREET_RX.sub("", p)
+        # ignore un paragraphe qui n'est qu'une formule de politesse
+        if CLOSE_RX.search(p):
+            continue
+        if p:
+            cleaned.append(p)
+    return cleaned[:4]
 
-
-SYS_PROMPT = """You write professional cover letters for banking and markets roles.
-Output ONLY valid JSON:
-{"paragraphs":["...", "...", "...", "..."]}
-
-Guidelines:
-- 3 to 4 concise paragraphs, no bullets, no markdown.
-- Use the candidate resume ('cv') to tailor achievements and skills.
-- Use the job description and the company name to align motivation and fit.
-- If language=FR, write fluent French; if EN, write fluent English.
-- Keep a professional, confident tone; avoid repetition and generic claims.
-"""
-
-
-def generate_body_paragraphs(bank: str, position: str, offer_text: str, language: str = "EN") -> List[str]:
-    cl = _client()
-    cv_text = _read_cv_text()
-
-    payload = {
-        "bank": bank,
-        "position": position,
-        "language": language,
-        "job_description": (offer_text or "")[:6000],
-        "cv": cv_text[:8000],  # on injecte le contenu de cv.txt
-        # fallback minimal si jamais cv.txt est absent
-        "identity_fallback": {"name": config.NOM, "email": config.EMAIL},
-    }
-
-    resp = cl.chat.completions.create(
-        model=config.MODEL,
-        messages=[
-            {"role": "system", "content": SYS_PROMPT},
-            {"role": "user", "content": json.dumps(payload, ensure_ascii=False)},
-        ],
-        temperature=0.6,
-        max_tokens=700,
+def generate_body_paragraphs(bank: str, position: str, offer: str, lang: str = "EN") -> list[str]:
+    system = SYS_EN if lang.upper() == "EN" else SYS_FR
+    user = (
+        f"Bank/Company: {bank}\nRole: {position}\nJob description:\n{offer}\n\n"
+        "Write 3–4 paragraphs aligned to the role, outcome-oriented, and tailored to the description. "
+        "No greeting, no closing."
+        if lang.upper() == "EN" else
+        f"Banque/Entreprise : {bank}\nPoste : {position}\nAnnonce :\n{offer}\n\n"
+        "Rédige 3–4 paragraphes pertinents alignés sur l’annonce, orientés résultats. "
+        "Aucune salutation ni formule finale."
     )
-
-    content = resp.choices[0].message.content.strip()
-    s, e = content.find("{"), content.rfind("}")
-    if s == -1 or e == -1 or e <= s:
-        raise RuntimeError("Réponse LLM non JSON.")
-    data = json.loads(content[s:e + 1])
-    paras = [p.strip() for p in data.get("paragraphs", []) if isinstance(p, str) and p.strip()]
-    if not paras:
-        raise RuntimeError("Aucun paragraphe généré.")
-    return paras[:4]
+    resp = _client.chat.completions.create(
+        model=config.MODEL,
+        messages=[{"role": "system", "content": system}, {"role": "user", "content": user}],
+        temperature=0.6,
+    )
+    raw = (resp.choices[0].message.content or "").strip()
+    return _paragraphize(raw)
