@@ -10,7 +10,7 @@ Bank Cover Letter Generator est un outil Python qui génère automatiquement des
 
 ## Fonctionnalités
 
-- Interface graphique avec CustomTkinter  
+- Interface graphique avec CustomTkinter (design limité) 
 - Liste pré-remplie de banques et institutions financieres avec recherche intégrée  
 - Génération de 3 à 4 paragraphes adaptés à l’offre grâce à l’API OpenAI (modèle 3.5 turbo car pas cher et efficace) 
 - Support de l’anglais et du français  
