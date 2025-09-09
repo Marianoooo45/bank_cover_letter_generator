@@ -1,0 +1,24 @@
+# secrets
+.env
+*.env
+.env.*
+
+# python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# builds / exe
+build/
+dist/
+*.spec
+*.exe
+
+# app artifacts
+generated_letters/
+*.pdf
+*.docx
+*.db
+*.log
+*.tmp

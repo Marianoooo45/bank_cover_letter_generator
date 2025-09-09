@@ -1,0 +1,6 @@
+openai>=1.30.0
+python-dotenv>=1.0.1
+python-docx>=1.1.2
+customtkinter>=5.2.2
+pywin32; platform_system=="Windows"   # pour l’export via Word (optionnel)
+lxml>=5.0.0
