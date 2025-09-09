@@ -48,7 +48,24 @@ USER_ADDRESS=Votre Adresse
 USER_CITY_COUNTRY=Votre Ville – Pays
 USER_PHONE=+33 6 00 00 00 00
 USER_EMAIL=adresse@email.com
+
+# Optionnel : si vous stockez le CV ailleurs que dans la racine du projet
+# CV_PATH=C:\chemin\vers\cv.txt
 ~~~
+
+---
+
+## CV local (important)
+
+L’application lit un fichier **`cv.txt`** (non versionné) pour personnaliser la lettre et éviter les informations aléatoires.
+
+Ordre de recherche :
+1. Chemin défini par la variable d’environnement `CV_PATH` (optionnel)  
+2. `./cv.txt` à la racine du projet  
+3. `cv.txt` dans le dossier courant
+
+Dans le dépôt public, un **`cv.example.txt`** est fourni comme modèle.  
+Créez votre `cv.txt` localement (même structure) et **ne le committez pas**.
 
 ---
 
@@ -74,12 +91,13 @@ python app.py
 bank_cover_letter_generator/
 ├── app.py              # Interface graphique
 ├── config.py           # Chargement des variables d’environnement
-├── llm_body.py         # Génération du contenu avec OpenAI
+├── llm_body.py         # Génération du contenu (lit cv.txt si présent)
 ├── writer.py           # Création du document Word
 ├── export_pdf.py       # Conversion DOCX → PDF
 ├── requirements.txt    # Dépendances Python
 ├── .env.example        # Exemple de configuration
-├── .gitignore          # Fichiers exclus du repo
+├── cv.example.txt      # Exemple de CV texte (cv.txt reste local)
+├── .gitignore          # Fichiers exclus du repo (inclut cv.txt et .env)
 └── README.md           # Documentation
 ~~~
 
@@ -87,7 +105,7 @@ bank_cover_letter_generator/
 
 ## Sécurité
 
-- Ne jamais publier votre fichier `.env`.  
+- Ne jamais publier votre fichier `.env` ni votre `cv.txt`.  
 - La clé API doit rester privée et être stockée uniquement dans vos variables d’environnement.  
 - `.gitignore` protège contre les commits accidentels.  
 - Vérification rapide avant un push :
