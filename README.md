@@ -1,7 +1,7 @@
 # Bank Cover Letter Generator
 
 Bank Cover Letter Generator est un outil Python qui génère automatiquement des lettres de motivation personnalisées pour des banques et institutions financières.  
-À partir d’une description de poste, l’application crée un texte professionnel structuré puis le met en forme dans un document Word (DOCX) et l’exporte en PDF.
+À partir d’une description de poste et de votre CV, l’application crée un texte professionnel structuré puis le met en forme dans un document Word (DOCX) et l’exporte en PDF.
 
 ---
 
