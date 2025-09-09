@@ -10,9 +10,9 @@ Bank Cover Letter Generator est un outil Python qui génère automatiquement des
 
 ## Fonctionnalités
 
-- Interface graphique moderne avec CustomTkinter  
-- Liste pré-remplie de banques avec recherche intégrée  
-- Génération de 3 à 4 paragraphes adaptés à l’offre grâce à l’API OpenAI  
+- Interface graphique avec CustomTkinter  
+- Liste pré-remplie de banques et institutions financieres avec recherche intégrée  
+- Génération de 3 à 4 paragraphes adaptés à l’offre grâce à l’API OpenAI (modèle 3.5 turbo car pas cher et efficace) 
 - Support de l’anglais et du français  
 - Mise en page Word automatisée (coordonnées, police, marges, espacements)  
 - Export automatique en PDF via Microsoft Word ou LibreOffice  
@@ -60,7 +60,7 @@ USER_EMAIL=adresse@email.com
 
 ## CV local (important)
 
-L’application lit un fichier **`cv.txt`** (non versionné) pour personnaliser la lettre et éviter les informations aléatoires.
+L’application lit un fichier **`cv.txt`** pour personnaliser la lettre et éviter les informations aléatoires.
 
 Ordre de recherche :
 1. Chemin défini par la variable d’environnement `CV_PATH` (optionnel)  
@@ -81,7 +81,7 @@ python app.py
 
 Étapes :
 1. Sélectionner une banque  
-2. Indiquer le poste visé  
+2. Indiquer le nom du poste  
 3. Coller la description de l’offre  
 4. Choisir la langue (EN / FR)  
 5. Générer la lettre → fichiers DOCX et PDF créés dans `generated_letters/<Nom Banque>/`
