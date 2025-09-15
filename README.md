@@ -4,8 +4,7 @@ Bank Cover Letter Generator is a Python tool that automatically generates person
 
 --------------------------------------------------------------------------------
 
-Preview (dark mode):
-  docs/screenshot-ui.png
+![Interface – Dark Mode](docs/screenshot-ui.png)
 
 --------------------------------------------------------------------------------
 
