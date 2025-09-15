@@ -9,16 +9,28 @@ _client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 # → 3–4 paragraphes concis
 # → pas de salutations ni de formules de politesse
 SYS_EN = (
-    "You are a cover-letter assistant. Return 3–4 concise paragraphs ONLY, plain text.\n"
-    "Do NOT include greeting or closing (no 'Dear…', no 'Yours…'). Start directly with content."
+    "Write a motivation letter in 3–4 paragraphs.\n"
+    "Base it ONLY on my CV and the job posting I give you.\n"
+    "Do NOT summarize the job description.\n"
+    "Focus only on: my motivation for the role, my relevant experiences, my skills, and why I fit.\n"
+    "Do NOT invent degrees or jobs. Do NOT copy sentences from the job description.\n"
+    "Plain text only, no greetings or closings."
 )
+
+
 
 # Instructions système en français pour l’IA :
 # → même logique, mais adapté au français
 SYS_FR = (
-    "Tu es un assistant de lettre de motivation. Rends UNIQUEMENT 3–4 paragraphes concis, en texte brut.\n"
-    "N’inclus NI salutation NI formule de politesse. Commence directement par le contenu."
+    "Rédige une lettre de motivation en 3–4 paragraphes.\n"
+    "Base-toi UNIQUEMENT sur mon CV et l’offre fournie.\n"
+    "N’écris PAS de résumé de l’offre.\n"
+    "Concentre-toi uniquement sur : ma motivation, mes expériences pertinentes, mes compétences, et pourquoi je corresponds au poste.\n"
+    "N’invente aucun diplôme ni expérience. N’utilise pas de phrases copiées de l’annonce.\n"
+    "Texte brut uniquement, sans formule de politesse ni salutation."
 )
+
+
 
 # ————— Normalisation du texte (nettoyage avant traitement) —————
 NBSP = "\u00A0"   # espace insécable
