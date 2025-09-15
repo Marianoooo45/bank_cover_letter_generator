@@ -1,123 +1,108 @@
 # Bank Cover Letter Generator
 
-Bank Cover Letter Generator est un outil Python qui génère automatiquement des lettres de motivation personnalisées pour des banques et institutions financières.  
-À partir d’une description de poste et de votre CV, l’application crée un texte professionnel structuré puis le met en forme dans un document Word (DOCX) et l’exporte en PDF.
+Bank Cover Letter Generator is a Python tool that automatically generates personalized cover letters for banks and financial institutions. Based on a job description and your CV, the app writes a professional, structured letter and formats it into a Word document (DOCX) with optional PDF export.
 
-## Aperçu
+--------------------------------------------------------------------------------
 
-![Interface – Dark Mode](docs/screenshot-ui.png)
----
+Preview (dark mode):
+  docs/screenshot-ui.png
 
-## Fonctionnalités
+--------------------------------------------------------------------------------
 
-- Interface graphique avec CustomTkinter (design limité) 
-- Liste pré-remplie de banques et institutions financieres avec recherche intégrée  
-- Génération de 3 à 4 paragraphes adaptés à l’offre grâce à l’API OpenAI (modèle 3.5 turbo car pas cher et efficace) 
-- Support de l’anglais et du français  
-- Mise en page Word automatisée (coordonnées, police, marges, espacements)  
-- Export automatique en PDF via Microsoft Word ou LibreOffice  
-- Organisation des fichiers par banque dans le dossier `generated_letters/`
+Features
+- GUI built with CustomTkinter (dark-mode friendly)
+- Pre-filled list of banks and financial institutions with integrated search
+- AI-powered generation of 3–4 tailored paragraphs via OpenAI API (gpt-3.5-turbo: cost-effective and fast)
+- Supports English and French
+- Automated Word formatting (contact details, fonts, margins, spacing)
+- Automatic PDF export via Microsoft Word or LibreOffice
+- Output organized per bank under: generated_letters/
 
----
+--------------------------------------------------------------------------------
 
-## Installation
+Installation & Setup
 
-Cloner le dépôt :
-~~~bash
-git clone https://github.com/Marianoooo45/bank_cover_letter_generator.git
-cd bank_cover_letter_generator
-~~~
+1) Clone the repo
+   git clone https://github.com/Marianoooo45/bank_cover_letter_generator.git
+   cd bank_cover_letter_generator
 
-Créer un environnement virtuel et installer les dépendances :
-~~~bash
-python -m venv .venv
-.venv\Scripts\activate  # Windows
-# ou
-source .venv/bin/activate  # Linux / macOS
+2) Create a virtual environment and install dependencies
+   python -m venv .venv
+   .venv\Scripts\activate          # Windows
+   # or
+   source .venv/bin/activate       # Linux / macOS
+   pip install -r requirements.txt
 
-pip install -r requirements.txt
-~~~
+3) Create your environment file
+   cp .env.example .env
 
-Configurer les variables d’environnement :
-~~~bash
-cp .env.example .env
-~~~
+4) Open .env and fill in the following (example)
+   OPENAI_API_KEY=sk-xxxxxxx
+   USER_FULLNAME=Your Name
+   USER_ADDRESS=Your Address
+   USER_CITY_COUNTRY=City – Country
+   USER_PHONE=+33 6 00 00 00 00
+   USER_EMAIL=email@example.com
+   # Optional if your CV is stored elsewhere:
+   # CV_PATH=/absolute/path/to/cv.txt
 
-Éditer `.env` pour ajouter la clé OpenAI et vos informations personnelles :
-~~~dotenv
-OPENAI_API_KEY=sk-xxxxxxx
-USER_FULLNAME=Votre Nom
-USER_ADDRESS=Votre Adresse
-USER_CITY_COUNTRY=Votre Ville – Pays
-USER_PHONE=+33 6 00 00 00 00
-USER_EMAIL=adresse@email.com
+--------------------------------------------------------------------------------
 
-# Optionnel : si vous stockez le CV ailleurs que dans la racine du projet
-# CV_PATH=C:\chemin\vers\cv.txt
-~~~
+Local CV (important)
 
----
+The app reads a local text CV (cv.txt) to personalize the letter and avoid random details.
 
-## CV local (important)
+Search order:
+  1. Path defined by CV_PATH in .env (optional)
+  2. ./cv.txt at the project root
+  3. cv.txt in the current working directory
 
-L’application lit un fichier **`cv.txt`** pour personnaliser la lettre et éviter les informations aléatoires.
+A cv.example.txt is provided in the repo as a template. Create your own cv.txt locally (same structure) and do not commit it.
 
-Ordre de recherche :
-1. Chemin défini par la variable d’environnement `CV_PATH` (optionnel)  
-2. `./cv.txt` à la racine du projet  
-3. `cv.txt` dans le dossier courant
+--------------------------------------------------------------------------------
 
-Dans le dépôt public, un **`cv.example.txt`** est fourni comme modèle.  
-Créez votre `cv.txt` localement (même structure) et **ne le committez pas**.
+Usage
 
----
+Run the app:
+  python app.py
 
-## Utilisation
+Steps:
+  1. Select a bank
+  2. Enter the job title
+  3. Paste the job description
+  4. Choose the language (EN / FR)
+  5. Generate → DOCX and PDF files are created in:
+       generated_letters/<BankName>/
 
-Lancer l’application :
-~~~bash
-python app.py
-~~~
+--------------------------------------------------------------------------------
 
-Étapes :
-1. Sélectionner une banque  
-2. Indiquer le nom du poste  
-3. Coller la description de l’offre  
-4. Choisir la langue (EN / FR)  
-5. Générer la lettre → fichiers DOCX et PDF créés dans `generated_letters/<Nom Banque>/`
+Project Structure
 
----
-
-## Structure du projet
-
-~~~text
 bank_cover_letter_generator/
-├── app.py              # Interface graphique
-├── config.py           # Chargement des variables d’environnement
-├── llm_body.py         # Génération du contenu (lit cv.txt si présent)
-├── writer.py           # Création du document Word
-├── export_pdf.py       # Conversion DOCX → PDF
-├── requirements.txt    # Dépendances Python
-├── .env.example        # Exemple de configuration
-├── cv.example.txt      # Exemple de CV texte (cv.txt reste local)
-├── .gitignore          # Fichiers exclus du repo (inclut cv.txt et .env)
-└── README.md           # Documentation
-~~~
+├─ app.py              # GUI
+├─ config.py           # Env/config loader
+├─ llm_body.py         # AI generation (reads cv.txt if present)
+├─ writer.py           # DOCX creation
+├─ export_pdf.py       # DOCX → PDF conversion
+├─ requirements.txt    # Python dependencies
+├─ .env.example        # Example env file
+├─ cv.example.txt      # Example CV text (cv.txt stays local)
+├─ .gitignore          # Excludes cv.txt, .env, etc.
+└─ README.md           # Documentation
 
----
+--------------------------------------------------------------------------------
 
-## Sécurité
+Security
 
-- Ne jamais publier votre fichier `.env` ni votre `cv.txt`.  
-- La clé API doit rester privée et être stockée uniquement dans vos variables d’environnement.  
-- `.gitignore` protège contre les commits accidentels.  
-- Vérification rapide avant un push :
-~~~bash
-git grep -n "sk-" -- .
-~~~
+- Never publish your .env or your cv.txt
+- Keep your OpenAI API key private (only in local env variables)
+- .gitignore is configured to prevent accidental commits
 
----
+Quick sanity check before pushing:
+  git grep -n "sk-" -- .
 
-## Licence
+--------------------------------------------------------------------------------
 
-Projet distribué sous licence MIT.
+License
+
+MIT License.
